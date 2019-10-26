@@ -4,7 +4,6 @@ var shanArmy = require('../src/index');
 describe('index', () => {
   it('First war', () => {
     var army = { horse: 100, elephant: 101, tank: 20, sling: 5 };
-    // expect(shanArmy(army)).to.be.eql([52, 50, 10, 3]);
     expect(shanArmy(army)).to.be.eql({ horse: 52, elephant: 50, tank: 10, sling: 3 });
   });
 

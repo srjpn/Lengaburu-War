@@ -1,73 +1,45 @@
-var { divideBy2, multiplyBy2 } = require('./utils');
+var { resourceBasedOnLimit, specialFunction, divideBy2, multiplyBy2 } = require('./lib');
 
 orderOfIteration = ['horse', 'elephant', 'tank', 'sling'];
 
 module.exports = (armySent) => {
   var limits = {
-    horse: {
-      value: 100,
-      adjacent: [this.elephant]
-    },
-    elephant: {
-      value: 50,
-      adjacent: [this.horse, this.tank]
-    },
-    tank: {
-      value: 10,
-      adjacent: [this.elephant, this.sling]
-    },
-    sling: {
-      value: 5,
-      adjacent: [this.tank]
-    }
+    horse: 100,
+    elephant: 50,
+    tank: 10,
+    sling: 5
   };
 
   return orderOfIteration.reduce((acc, x, i, arr) => {
-    var battalionUsed = Math.round(armySent[x] / 2);
-    var reminder = battalionUsed - limits[x].value < 0 ? 0 : battalionUsed - limits[x].value;
+    var battalionUsed = Math.round(divideBy2(armySent[x]));
+    var reminder = battalionUsed - limits[x] < 0 ? 0 : battalionUsed - limits[x];
     if (reminder > 0) {
       const index = i - 1;
-      const previousBattalion = limits[arr[index]];
-      ({ reminder, previousBattalionUsed } = fetchFromPreviousBattalion(previousBattalion, reminder));
-      battalionUsed = battalionUsed - previousBattalionUsed / 2;
-      acc.hasOwnProperty(arr[index]) && (acc[arr[index]] += previousBattalionUsed);
+      ({ reminder, used, limit } = fetchFromPreviousBattalion(limits[arr[index]], reminder));
+      battalionUsed = battalionUsed - divideBy2(used);
+      limits[arr[index]] = limit;
+      acc.hasOwnProperty(arr[index]) && (acc[arr[index]] += used);
     }
     if (reminder > 0) {
       const index = i + 1;
-      const nextBattalion = limits[arr[index]];
-      ({ reminder, nextBattalionUsed } = fetchFromNextBattalion(nextBattalion, reminder));
-      battalionUsed = battalionUsed < (nextBattalionUsed * 2) ? 0 : Math.round((battalionUsed / 4 - nextBattalionUsed / 2)) * 4;
-      acc.hasOwnProperty(arr[index]) && (acc[arr[index]] += nextBattalionUsed);
+      ({ reminder, used, limit } = fetchFromNextBattalion(limits[arr[index]], reminder));
+      battalionUsed = battalionUsed < (used * 2) ? 0 : specialFunction(battalionUsed, used);
+      limits[arr[index]] = limit;
+      acc.hasOwnProperty(arr[index]) && (acc[arr[index]] += used);
     }
     if (reminder > 0) {
       acc["Failed"] = true;
     }
-    limits[x].value = limits[x].value - battalionUsed;
+    limits[x] = limits[x] - battalionUsed;
     acc[x] = acc[x] ? acc[x] + (battalionUsed - reminder) : (battalionUsed - reminder);
     return acc;
   }, { horse: 0, elephant: 0, tank: 0, sling: 0 });
 };
 
 const fetchFromPreviousBattalion = (previousBattalion, reminder) => {
-  ({ reminder, battalionUsed } = newFunction(previousBattalion, reminder, multiplyBy2));
-  return { reminder, previousBattalionUsed: battalionUsed };
+  return resourceBasedOnLimit(previousBattalion, reminder, multiplyBy2);
 };
 
 const fetchFromNextBattalion = (nextBattalion, reminder) => {
-  ({ reminder, battalionUsed } = newFunction(nextBattalion, reminder, divideBy2));
-  return { reminder, nextBattalionUsed: battalionUsed };
+  return resourceBasedOnLimit(nextBattalion, reminder, divideBy2);
 };
-
-const newFunction = (battalion, reminder, reducer) => {
-  var battalionUsed = 0;
-  if (battalion && battalion.value > 0) {
-    battalionUsed = battalion.value;
-    if (battalionUsed > reducer(reminder)) {
-      battalionUsed = reducer(reminder);
-    }
-    reminder = Math.floor(reducer(reminder) - (battalionUsed));
-    battalion.value -= battalionUsed;
-  }
-  return { reminder, battalionUsed };
-};
-
