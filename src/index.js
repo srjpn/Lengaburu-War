@@ -1,5 +1,4 @@
-
-
+var { divideBy2, multiplyBy2 } = require('./utils');
 
 module.exports = (armySent) => {
   var limits = {
@@ -25,16 +24,18 @@ module.exports = (armySent) => {
     var battalionUsed = Math.round(armySent[x] / 2);
     var reminder = battalionUsed - limits[x].value;
     if (reminder > 0) {
-      const previousBattalion = limits[arr[i - 1]];
+      const index = i - 1;
+      const previousBattalion = limits[arr[index]];
       ({ reminder, previousBattalionUsed } = fetchFromPreviousBattalion(previousBattalion, reminder));
-      acc[i - 1] += previousBattalionUsed;
-      battalionUsed = battalionUsed - previousBattalionUsed / 2;
+      battalionUsed = battalionUsed - previousBattalionUsed/2;
+      acc[index] += previousBattalionUsed;
     }
-    // console.log(x, reminder, '=============')
     if (reminder > 0) {
-      ({ reminder, nextBattalionUsed } = fetchFromNextBattalion(limits, arr, i, reminder, acc));
+      const index = i + 1;
+      const nextBattalion = limits[arr[index]];
+      ({ reminder, nextBattalionUsed } = fetchFromNextBattalion(nextBattalion, reminder));
       battalionUsed = battalionUsed < (nextBattalionUsed * 2) ? 0 : battalionUsed - (nextBattalionUsed * 2);
-      // console.log(x, battalionUsed, nextBattalionUsed, '-----------')
+      acc[index] = acc[index] ? acc[index] + nextBattalionUsed : nextBattalionUsed;
     }
     limits[x].value = limits[x].value - battalionUsed;
     acc[i] = acc[i] ? acc[i] + battalionUsed : battalionUsed;
@@ -42,31 +43,26 @@ module.exports = (armySent) => {
   }, []);
 };
 
-function fetchFromPreviousBattalion(previousBattalion, reminder) {
-  var previousBattalionUsed = 0;
-  if (previousBattalion && previousBattalion.value > 1) {
-    previousBattalionUsed = previousBattalion.value;
-    if (previousBattalionUsed > (reminder * 2)) {
-      previousBattalionUsed = (reminder * 2);
-    }
-    reminder = reminder - previousBattalionUsed / 2;
-    previousBattalion.value -= previousBattalionUsed;
-  }
-  return { reminder, previousBattalionUsed };
-}
+const fetchFromPreviousBattalion = (previousBattalion, reminder) => {
+  ({ reminder, battalionUsed } = newFunction(previousBattalion, reminder, multiplyBy2, divideBy2));
+  return { reminder, previousBattalionUsed: battalionUsed };
+};
 
-function fetchFromNextBattalion(limits, arr, i, reminder, acc) {
-  const nextBattalion = limits[arr[i + 1]];
-  var nextBattalionUsed = 0;
-  if (nextBattalion && nextBattalion.value > 0) {
-    nextBattalionUsed = nextBattalion.value;
-    if (nextBattalionUsed > (reminder / 2)) {
-      nextBattalionUsed = Math.round(reminder / 2);
+const fetchFromNextBattalion = (nextBattalion, reminder) => {
+  ({ reminder, battalionUsed } = newFunction(nextBattalion, reminder, divideBy2, multiplyBy2));
+  return { reminder, nextBattalionUsed: battalionUsed };
+};
+
+const newFunction = (battalion, reminder, reducer, multiplier) => {
+  var battalionUsed = 0;
+  if (battalion && battalion.value > 0) {
+    battalionUsed = battalion.value;
+    if (battalionUsed > reducer(reminder)) {
+      battalionUsed = reducer(reminder);
     }
-    reminder = reminder - nextBattalionUsed * 2;
-    nextBattalion.value -= nextBattalionUsed;
-    acc[i + 1] = acc[i + 1] ? acc[i + 1] - nextBattalionUsed : nextBattalionUsed;
+    reminder = reminder - multiplier(battalionUsed);
+    battalion.value -= battalionUsed;
   }
-  return { reminder, nextBattalionUsed };
-}
+  return { reminder, battalionUsed };
+};
 
