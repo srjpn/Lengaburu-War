@@ -22,7 +22,7 @@ module.exports = (armySent) => {
 
   return ['horse', 'elephant', 'tank', 'sling'].reduce((acc, x, i, arr) => {
     var battalionUsed = Math.round(armySent[x] / 2);
-    var reminder = battalionUsed - limits[x].value;
+    var reminder = battalionUsed - limits[x].value < 0 ? 0 : battalionUsed - limits[x].value;
     if (reminder > 0) {
       const index = i - 1;
       const previousBattalion = limits[arr[index]];
@@ -34,11 +34,14 @@ module.exports = (armySent) => {
       const index = i + 1;
       const nextBattalion = limits[arr[index]];
       ({ reminder, nextBattalionUsed } = fetchFromNextBattalion(nextBattalion, reminder));
-      battalionUsed = battalionUsed < (nextBattalionUsed * 2) ? 0 : battalionUsed - (nextBattalionUsed * 2);
+      battalionUsed = battalionUsed < (nextBattalionUsed * 2) ? 0 : Math.round((battalionUsed / 4 - nextBattalionUsed / 2)) * 4;
       acc[index] = acc[index] ? acc[index] + nextBattalionUsed : nextBattalionUsed;
     }
+    if (reminder > 0) {
+      console.log('failed...................')
+    }
     limits[x].value = limits[x].value - battalionUsed;
-    acc[i] = acc[i] ? acc[i] + battalionUsed : battalionUsed;
+    acc[i] = acc[i] ? acc[i] + (battalionUsed - reminder) : (battalionUsed - reminder);
     return acc;
   }, []);
 };
