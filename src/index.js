@@ -1,5 +1,7 @@
 var { divideBy2, multiplyBy2 } = require('./utils');
 
+orderOfIteration = ['horse', 'elephant', 'tank', 'sling'];
+
 module.exports = (armySent) => {
   var limits = {
     horse: {
@@ -20,7 +22,7 @@ module.exports = (armySent) => {
     }
   };
 
-  return ['horse', 'elephant', 'tank', 'sling'].reduce((acc, x, i, arr) => {
+  return orderOfIteration.reduce((acc, x, i, arr) => {
     var battalionUsed = Math.round(armySent[x] / 2);
     var reminder = battalionUsed - limits[x].value < 0 ? 0 : battalionUsed - limits[x].value;
     if (reminder > 0) {
@@ -28,17 +30,17 @@ module.exports = (armySent) => {
       const previousBattalion = limits[arr[index]];
       ({ reminder, previousBattalionUsed } = fetchFromPreviousBattalion(previousBattalion, reminder));
       battalionUsed = battalionUsed - previousBattalionUsed / 2;
-      acc[arr[index]] += previousBattalionUsed;
+      acc.hasOwnProperty(arr[index]) && (acc[arr[index]] += previousBattalionUsed);
     }
     if (reminder > 0) {
       const index = i + 1;
       const nextBattalion = limits[arr[index]];
       ({ reminder, nextBattalionUsed } = fetchFromNextBattalion(nextBattalion, reminder));
       battalionUsed = battalionUsed < (nextBattalionUsed * 2) ? 0 : Math.round((battalionUsed / 4 - nextBattalionUsed / 2)) * 4;
-      acc[arr[index]] += nextBattalionUsed;
+      acc.hasOwnProperty(arr[index]) && (acc[arr[index]] += nextBattalionUsed);
     }
     if (reminder > 0) {
-      console.log('failed...................')
+      acc["Failed"] = true;
     }
     limits[x].value = limits[x].value - battalionUsed;
     acc[x] = acc[x] ? acc[x] + (battalionUsed - reminder) : (battalionUsed - reminder);

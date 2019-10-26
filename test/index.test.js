@@ -15,6 +15,6 @@ describe('index', () => {
 
   it('Third war', () => {
     var army = { horse: 250, elephant: 50, tank: 20, sling: 15 };
-    expect(shanArmy(army)).to.be.eql({ horse: 100, elephant: 38, tank: 10, sling: 5 });
+    expect(shanArmy(army)).to.be.eql({ horse: 100, elephant: 38, tank: 10, sling: 5, Failed: true });
   });
 });
