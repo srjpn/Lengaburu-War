@@ -28,22 +28,22 @@ module.exports = (armySent) => {
       const previousBattalion = limits[arr[index]];
       ({ reminder, previousBattalionUsed } = fetchFromPreviousBattalion(previousBattalion, reminder));
       battalionUsed = battalionUsed - previousBattalionUsed / 2;
-      acc[index] += previousBattalionUsed;
+      acc[arr[index]] += previousBattalionUsed;
     }
     if (reminder > 0) {
       const index = i + 1;
       const nextBattalion = limits[arr[index]];
       ({ reminder, nextBattalionUsed } = fetchFromNextBattalion(nextBattalion, reminder));
       battalionUsed = battalionUsed < (nextBattalionUsed * 2) ? 0 : Math.round((battalionUsed / 4 - nextBattalionUsed / 2)) * 4;
-      acc[index] = acc[index] ? acc[index] + nextBattalionUsed : nextBattalionUsed;
+      acc[arr[index]] += nextBattalionUsed;
     }
     if (reminder > 0) {
       console.log('failed...................')
     }
     limits[x].value = limits[x].value - battalionUsed;
-    acc[i] = acc[i] ? acc[i] + (battalionUsed - reminder) : (battalionUsed - reminder);
+    acc[x] = acc[x] ? acc[x] + (battalionUsed - reminder) : (battalionUsed - reminder);
     return acc;
-  }, []);
+  }, { horse: 0, elephant: 0, tank: 0, sling: 0 });
 };
 
 const fetchFromPreviousBattalion = (previousBattalion, reminder) => {
