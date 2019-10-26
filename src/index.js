@@ -27,7 +27,7 @@ module.exports = (armySent) => {
       const index = i - 1;
       const previousBattalion = limits[arr[index]];
       ({ reminder, previousBattalionUsed } = fetchFromPreviousBattalion(previousBattalion, reminder));
-      battalionUsed = battalionUsed - previousBattalionUsed/2;
+      battalionUsed = battalionUsed - previousBattalionUsed / 2;
       acc[index] += previousBattalionUsed;
     }
     if (reminder > 0) {
@@ -44,23 +44,23 @@ module.exports = (armySent) => {
 };
 
 const fetchFromPreviousBattalion = (previousBattalion, reminder) => {
-  ({ reminder, battalionUsed } = newFunction(previousBattalion, reminder, multiplyBy2, divideBy2));
+  ({ reminder, battalionUsed } = newFunction(previousBattalion, reminder, multiplyBy2));
   return { reminder, previousBattalionUsed: battalionUsed };
 };
 
 const fetchFromNextBattalion = (nextBattalion, reminder) => {
-  ({ reminder, battalionUsed } = newFunction(nextBattalion, reminder, divideBy2, multiplyBy2));
+  ({ reminder, battalionUsed } = newFunction(nextBattalion, reminder, divideBy2));
   return { reminder, nextBattalionUsed: battalionUsed };
 };
 
-const newFunction = (battalion, reminder, reducer, multiplier) => {
+const newFunction = (battalion, reminder, reducer) => {
   var battalionUsed = 0;
   if (battalion && battalion.value > 0) {
     battalionUsed = battalion.value;
     if (battalionUsed > reducer(reminder)) {
       battalionUsed = reducer(reminder);
     }
-    reminder = reminder - multiplier(battalionUsed);
+    reminder = Math.floor(reducer(reminder) - (battalionUsed));
     battalion.value -= battalionUsed;
   }
   return { reminder, battalionUsed };
