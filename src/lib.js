@@ -10,9 +10,9 @@ exports.resourceBasedOnLimit = (limit, reminder, action) => {
   return { reminder, used, limit: limit - used };
 };
 
-exports.specialFunction = (minuend, subtrahend) => {
+exports.specialFunction = (minuend, subtrahend, operation) => {
   subtrahend = isOdd(subtrahend) ? (subtrahend - .5) : subtrahend;
-  return minuend - exports.multiplyBy2(subtrahend);
+  return minuend - operation(subtrahend);
 };
 
 const isOdd = (number) => number % 2 !== 0

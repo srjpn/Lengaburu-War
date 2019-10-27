@@ -21,7 +21,7 @@ describe('Lib', () => {
 
   describe('special function', () => {
     it('should give 100 for 125 and 13', () => {
-      expect(specialFunction(125, 13)).to.be.equal(100);
+      expect(specialFunction(125, 13, multiplyBy2)).to.be.equal(100);
     });
   });
 
