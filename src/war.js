@@ -1,4 +1,4 @@
-var { resourceBasedOnLimit, specialFunction, divideBy2, multiplyBy2 } = require('./lib');
+var { resourceBasedOnLimit, specialFunction, divideBy2, multiplyBy2 } = require('./utils');
 
 const fetchFromPreviousBattalion = ({ reminder, battalionUsed, index, limits, armyToBeSent }) => {
   let limit = 0;
@@ -34,11 +34,14 @@ const declareIfFailed = ({ reminder, battalionUsed, index, limits, armyToBeSent 
 };
 
 const findBattalionCount = (incomingArmy, battalion, ourArmy, index, armyToBeSent) => {
-  var battalionUsed = Math.round(divideBy2(incomingArmy[battalion]));
-  var reminder = battalionUsed - ourArmy[battalion] < 0 ? 0 : battalionUsed - ourArmy[battalion];
+  var battalionUsed = findBattalionToBeUsed(incomingArmy, battalion);
+  var reminder = findRemainingBattalion(battalionUsed, ourArmy, battalion);
+
   const initialValue = { reminder, battalionUsed, index, limits: ourArmy, armyToBeSent };
   ({ reminder, battalionUsed } = ACTIONS.reduce((params, action) => action(params), initialValue));
+
   ourArmy[battalion] = ourArmy[battalion] - battalionUsed;
+
   armyToBeSent[battalion] = armyToBeSent[battalion] ? armyToBeSent[battalion] + (battalionUsed - reminder) : (battalionUsed - reminder);
   return armyToBeSent;
 };
@@ -55,4 +58,8 @@ module.exports = (incomingArmy) => {
       findBattalionCount(incomingArmy, battalion, ourArmy, index, armyToBeSent));
   return armyToBeSent;
 };
+
+const findBattalionToBeUsed = (incomingArmy, battalion) => Math.round(divideBy2(incomingArmy[battalion]));
+
+const findRemainingBattalion = (battalionUsed, ourArmy, battalion) => (battalionUsed - ourArmy[battalion] < 0 ? 0 : battalionUsed - ourArmy[battalion])
 

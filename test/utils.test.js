@@ -1,5 +1,5 @@
 var { expect } = require('./testHelpers');
-var { resourceBasedOnLimit, divideBy2, multiplyBy2, specialFunction } = require('../src/lib');
+var { resourceBasedOnLimit, divideBy2, multiplyBy2, specialFunction } = require('../src/utils');
 
 describe('Lib', () => {
   describe('resourceBasedOnLimit', () => {

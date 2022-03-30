@@ -1,5 +1,5 @@
 var { expect } = require('./testHelpers');
-var shanArmy = require('../src/index');
+var shanArmy = require('../src/war.js');
 
 describe('index', () => {
   it('First war', () => {
