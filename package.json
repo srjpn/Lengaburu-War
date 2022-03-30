@@ -8,7 +8,7 @@
     "unit": "mocha test --recursive",
     "test": "npm run lint && npm run unit",
     "lint": "eslint src --ext .js --fix",
-    "package": "zip -r lengaburu-war.zip ./* -x node_modules"
+    "package": "zip -r lengaburu-war.zip ./* -x \"node_modules*\""
   },
   "author": "",
   "license": "ISC",
